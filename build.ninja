@@ -1,0 +1,13 @@
+
+rule yacc
+    command = goyacc $in
+
+rule generate
+    command = go generate -v ./...
+
+build y.go: yacc asn1.y
+
+rule test
+    command = go test -v ./...
+
+default y.go

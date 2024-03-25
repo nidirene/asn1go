@@ -50,6 +50,40 @@ func testNumber(t *testing.T, input string, expectedValue Number) {
 	}
 }
 
+func testHString(t *testing.T, input string, expectedValue string) {
+	str := input
+	lex := lexForString(str)
+	symType := &yySymType{}
+	gotType := lex.Lex(symType)
+	if lex.err != nil {
+		t.Errorf("Expected nil error, got %v", lex.err)
+	}
+	expectedType := HSTRING
+	if gotType != expectedType {
+		t.Errorf("Expected %v token, got %v", expectedType, gotType)
+	}
+	if symType.hstring != expectedValue {
+		t.Errorf("Expected lexem '%v' to be read, got '%v'", expectedValue, symType.hstring)
+	}
+}
+
+func testBString(t *testing.T, input string, expectedValue string) {
+	str := input
+	lex := lexForString(str)
+	symType := &yySymType{}
+	gotType := lex.Lex(symType)
+	if lex.err != nil {
+		t.Errorf("Expected nil error, got %v", lex.err)
+	}
+	expectedType := BSTRING
+	if gotType != expectedType {
+		t.Errorf("Expected %v token, got %v", expectedType, gotType)
+	}
+	if symType.bstring != expectedValue {
+		t.Errorf("Expected lexem '%v' to be read, got '%v'", expectedValue, symType.bstring)
+	}
+}
+
 func testError(t *testing.T, input string, expectedErr string) {
 	str := input
 	lex := lexForString(str)
@@ -138,6 +172,10 @@ func TestNumber(t *testing.T) {
 	testNumber(t, "12345", Number(12345))
 }
 
+func TestOctetString(t *testing.T) {
+	testBString(t, "'01A'B", "01A")
+}
+
 func TestAssignment(t *testing.T) {
 	testLexemType(t, "::=", ASSIGNMENT)
 }
@@ -196,8 +234,8 @@ func TestSingleSymbolTokens(t *testing.T) {
 	testLexemType(t, ":", COLON)
 	testLexemType(t, "=", EQUALS)
 	testLexemType(t, "\"", QUOTATION_MARK)
-	testLexemType(t, "'", APOSTROPHE)
-	//testLexemType(t, " ", SPACE)  // TODO
+	// testLexemType(t, "'", APOSTROPHE)
+	// testLexemType(t, " ", SPACE)  // TODO
 	testLexemType(t, ";", SEMICOLON)
 	testLexemType(t, "@", AT)
 	testLexemType(t, "|", PIPE)
@@ -365,7 +403,6 @@ func TestRealSyntax(t *testing.T) {
 			}
 		}
 	}
-
 }
 
 func tokName(tok int) string {

@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/chemikadze/asn1go/internal/utils"
 	"io/ioutil"
 	"os"
+
+	"github.com/nidirene/asn1go/internal/utils"
 )
 
 func main() {

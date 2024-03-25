@@ -10,92 +10,90 @@ import (
 	"unicode/utf8"
 )
 
-var (
-	RESERVED_WORDS map[string]int = map[string]int{
-		"ABSENT":           ABSENT,
-		"ENCODED":          ENCODED,
-		"INTEGER":          INTEGER,
-		"RELATIVE-OID":     RELATIVE_OID,
-		"ABSTRACT-SYNTAX":  ABSTRACT_SYNTAX,
-		"END":              END,
-		"INTERSECTION":     INTERSECTION,
-		"SEQUENCE":         SEQUENCE,
-		"ALL":              ALL,
-		"ENUMERATED":       ENUMERATED,
-		"ISO646String":     ISO646String,
-		"SET":              SET,
-		"APPLICATION":      APPLICATION,
-		"EXCEPT":           EXCEPT,
-		"MAX":              MAX,
-		"SIZE":             SIZE,
-		"AUTOMATIC":        AUTOMATIC,
-		"EXPLICIT":         EXPLICIT,
-		"MIN":              MIN,
-		"STRING":           STRING,
-		"BEGIN":            BEGIN,
-		"EXPORTS":          EXPORTS,
-		"MINUS-INFINITY":   MINUS_INFINITY,
-		"SYNTAX":           SYNTAX,
-		"BIT":              BIT,
-		"EXTENSIBILITY":    EXTENSIBILITY,
-		"NULL":             NULL,
-		"T61String":        T61String,
-		"BMPString":        BMPString,
-		"EXTERNAL":         EXTERNAL,
-		"NumericString":    NumericString,
-		"TAGS":             TAGS,
-		"BOOLEAN":          BOOLEAN,
-		"FALSE":            FALSE,
-		"OBJECT":           OBJECT,
-		"TeletexString":    TeletexString,
-		"BY":               BY,
-		"FROM":             FROM,
-		"ObjectDescriptor": ObjectDescriptor,
-		"TRUE":             TRUE,
-		"CHARACTER":        CHARACTER,
-		"GeneralizedTime":  GeneralizedTime,
-		"OCTET":            OCTET,
-		"TYPE-IDENTIFIER":  TYPE_IDENTIFIER,
-		"CHOICE":           CHOICE,
-		"GeneralString":    GeneralString,
-		"OF":               OF,
-		"UNION":            UNION,
-		"CLASS":            CLASS,
-		"GraphicString":    GraphicString,
-		"OPTIONAL":         OPTIONAL,
-		"UNIQUE":           UNIQUE,
-		"COMPONENT":        COMPONENT,
-		"IA5String":        IA5String,
-		"PATTERN":          PATTERN,
-		"UNIVERSAL":        UNIVERSAL,
-		"COMPONENTS":       COMPONENTS,
-		"IDENTIFIER":       IDENTIFIER,
-		"PDV":              PDV,
-		"UniversalString":  UniversalString,
-		"CONSTRAINED":      CONSTRAINED,
-		"IMPLICIT":         IMPLICIT,
-		"PLUS-INFINITY":    PLUS_INFINITY,
-		"UTCTime":          UTCTime,
-		"CONTAINING":       CONTAINING,
-		"IMPLIED":          IMPLIED,
-		"PRESENT":          PRESENT,
-		"UTF8String":       UTF8String,
-		"DEFAULT":          DEFAULT,
-		"IMPORTS":          IMPORTS,
-		"PrintableString":  PrintableString,
-		"VideotexString":   VideotexString,
-		"DEFINITIONS":      DEFINITIONS,
-		"INCLUDES":         INCLUDES,
-		"PRIVATE":          PRIVATE,
-		"VisibleString":    VisibleString,
-		"EMBEDDED":         EMBEDDED,
-		"INSTANCE":         INSTANCE,
-		"REAL":             REAL,
-		"WITH":             WITH,
-		"ANY":              ANY,
-		"DEFINED":          DEFINED,
-	}
-)
+var RESERVED_WORDS map[string]int = map[string]int{
+	"ABSENT":           ABSENT,
+	"ENCODED":          ENCODED,
+	"INTEGER":          INTEGER,
+	"RELATIVE-OID":     RELATIVE_OID,
+	"ABSTRACT-SYNTAX":  ABSTRACT_SYNTAX,
+	"END":              END,
+	"INTERSECTION":     INTERSECTION,
+	"SEQUENCE":         SEQUENCE,
+	"ALL":              ALL,
+	"ENUMERATED":       ENUMERATED,
+	"ISO646String":     ISO646String,
+	"SET":              SET,
+	"APPLICATION":      APPLICATION,
+	"EXCEPT":           EXCEPT,
+	"MAX":              MAX,
+	"SIZE":             SIZE,
+	"AUTOMATIC":        AUTOMATIC,
+	"EXPLICIT":         EXPLICIT,
+	"MIN":              MIN,
+	"STRING":           STRING,
+	"BEGIN":            BEGIN,
+	"EXPORTS":          EXPORTS,
+	"MINUS-INFINITY":   MINUS_INFINITY,
+	"SYNTAX":           SYNTAX,
+	"BIT":              BIT,
+	"EXTENSIBILITY":    EXTENSIBILITY,
+	"NULL":             NULL,
+	"T61String":        T61String,
+	"BMPString":        BMPString,
+	"EXTERNAL":         EXTERNAL,
+	"NumericString":    NumericString,
+	"TAGS":             TAGS,
+	"BOOLEAN":          BOOLEAN,
+	"FALSE":            FALSE,
+	"OBJECT":           OBJECT,
+	"TeletexString":    TeletexString,
+	"BY":               BY,
+	"FROM":             FROM,
+	"ObjectDescriptor": ObjectDescriptor,
+	"TRUE":             TRUE,
+	"CHARACTER":        CHARACTER,
+	"GeneralizedTime":  GeneralizedTime,
+	"OCTET":            OCTET,
+	"TYPE-IDENTIFIER":  TYPE_IDENTIFIER,
+	"CHOICE":           CHOICE,
+	"GeneralString":    GeneralString,
+	"OF":               OF,
+	"UNION":            UNION,
+	"CLASS":            CLASS,
+	"GraphicString":    GraphicString,
+	"OPTIONAL":         OPTIONAL,
+	"UNIQUE":           UNIQUE,
+	"COMPONENT":        COMPONENT,
+	"IA5String":        IA5String,
+	"PATTERN":          PATTERN,
+	"UNIVERSAL":        UNIVERSAL,
+	"COMPONENTS":       COMPONENTS,
+	"IDENTIFIER":       IDENTIFIER,
+	"PDV":              PDV,
+	"UniversalString":  UniversalString,
+	"CONSTRAINED":      CONSTRAINED,
+	"IMPLICIT":         IMPLICIT,
+	"PLUS-INFINITY":    PLUS_INFINITY,
+	"UTCTime":          UTCTime,
+	"CONTAINING":       CONTAINING,
+	"IMPLIED":          IMPLIED,
+	"PRESENT":          PRESENT,
+	"UTF8String":       UTF8String,
+	"DEFAULT":          DEFAULT,
+	"IMPORTS":          IMPORTS,
+	"PrintableString":  PrintableString,
+	"VideotexString":   VideotexString,
+	"DEFINITIONS":      DEFINITIONS,
+	"INCLUDES":         INCLUDES,
+	"PRIVATE":          PRIVATE,
+	"VisibleString":    VisibleString,
+	"EMBEDDED":         EMBEDDED,
+	"INSTANCE":         INSTANCE,
+	"REAL":             REAL,
+	"WITH":             WITH,
+	"ANY":              ANY,
+	"DEFINED":          DEFINED,
+}
 
 // MyLexer is an ASN.1 lexer that is producing lexems for the generated goyacc parser.
 type MyLexer struct {
@@ -138,6 +136,11 @@ func (lex *MyLexer) Lex(lval *yySymType) int {
 			lex.skipBlockComment()
 			lastWasNumber = false
 			continue
+		}
+
+		if r == '\'' {
+			lex.unreadRune()
+			return lex.consumeOctetString(lval)
 		}
 
 		// parse lexem
@@ -406,6 +409,40 @@ func (lex *MyLexer) consumeNumber(lval *yySymType) int {
 	}
 }
 
+func (lex *MyLexer) consumeOctetString(lval *yySymType) int {
+	r, _, err := lex.bufReader.ReadRune()
+	if err != nil {
+		lex.Error(err.Error())
+		return -1
+	}
+	acc := bytes.NewBufferString("")
+	// acc.WriteRune(r)
+	lastR := r
+
+	for {
+		r, _, err := lex.readRune()
+		if err == io.EOF || isWhitespace(r) {
+			if lastR == 'B' {
+				lval.bstring = acc.String()
+				return BSTRING
+			} else if lastR == 'H' {
+				lval.hstring = acc.String()
+				return HSTRING
+			}
+		}
+
+		if err != nil {
+			lex.Error(fmt.Sprintf("Failed to read: %v", err.Error()))
+			return -1
+		}
+
+		if (r != '\'') && (r != 'B') && (r != 'H') {
+			acc.WriteRune(r)
+		}
+		lastR = r
+	}
+}
+
 // Error implements yyLexer, and is used by the parser to communicate errors.
 func (lex *MyLexer) Error(e string) {
 	lex.err = fmt.Errorf("line %v: %v", lex.lineNo+1, e)
@@ -413,22 +450,22 @@ func (lex *MyLexer) Error(e string) {
 
 func isWhitespace(r rune) bool {
 	switch x := int(r); x {
-	//HORIZONTAL TABULATION (9)
+	// HORIZONTAL TABULATION (9)
 	case 9:
 		return true
-	//LINE FEED (10)
+	// LINE FEED (10)
 	case 10:
 		return true
-	//VERTICAL TABULATION (11)
+	// VERTICAL TABULATION (11)
 	case 11:
 		return true
-	//FORM FEED (12)
+	// FORM FEED (12)
 	case 12:
 		return true
-	//CARRIAGE RETURN (13)
+	// CARRIAGE RETURN (13)
 	case 13:
 		return true
-	//SPACE (32)
+	// SPACE (32)
 	case 32:
 		return true
 	default:
@@ -438,16 +475,16 @@ func isWhitespace(r rune) bool {
 
 func isNewline(r rune) bool {
 	switch x := int(r); x {
-	//LINE FEED (10)
+	// LINE FEED (10)
 	case 10:
 		return true
-	//VERTICAL TABULATION (11)
+	// VERTICAL TABULATION (11)
 	case 11:
 		return true
-	//FORM FEED (12)
+	// FORM FEED (12)
 	case 12:
 		return true
-	//CARRIAGE RETURN (13)
+	// CARRIAGE RETURN (13)
 	case 13:
 		return true
 	default:
@@ -457,4 +494,9 @@ func isNewline(r rune) bool {
 
 func isIdentifierChar(r rune) bool {
 	return unicode.IsLetter(r) || unicode.IsDigit(r) || r == '-'
+}
+
+// TODO NEI Check Hex Characters
+func isOctetChar(r rune) bool {
+	return unicode.Is(unicode.Hex_Digit, r) || r == ' '
 }

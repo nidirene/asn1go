@@ -14,9 +14,12 @@ import (
 %union{
     name         string
     numberRepr   string
+    hstring      string
+    bstring      string
 
     Number       Number
     Real         Real
+    
     TagDefault int
     ExtensionDefault bool
     ModuleIdentifier ModuleIdentifier
@@ -236,11 +239,14 @@ import (
 %type <Value> BuiltinValue
 %type <Value> Value
 %type <Value> IntegerValue
+%type <Type> OctetStringType
+%type <Value> OctetStringValue
 %type <Type> RealType
 %type <Value> RealValue
 %type <Type> BooleanType
 %type <Value> BooleanValue
 %type <Value> NumericRealValue SpecialRealValue
+%type <Value> ReferencedValue
 %type <Number> SignedNumber
 %type <Number> number
 %type <Assignment> Assignment
@@ -542,7 +548,7 @@ NamedType : identifier Type  { $$ = NamedType{Identifier: Identifier($1), Type: 
 // 16.7
 
 Value : BuiltinValue
-//      | ReferencedValue
+      | ReferencedValue
 //      | ObjectClassFieldValue
 ;
 
@@ -560,7 +566,7 @@ BuiltinValue : // BitStringValue
                | IntegerValue
 //             | NullValue
                | ObjectIdentifierValue  { $$ = $1 }
-//             | OctetStringValue
+               | OctetStringValue 
                | RealValue
 //             | RelativeOIDValue
 //             | SequenceValue
@@ -569,6 +575,11 @@ BuiltinValue : // BitStringValue
 //             | SetOfValue
 //             | TaggedValue
 ;
+
+ReferencedValue : DefinedValue { $$ = $1 }
+//                | ValueFromObject
+;
+
 
 // 17.3
 
@@ -673,7 +684,11 @@ NamedBit : identifier OPEN_ROUND number CLOSE_ROUND  { $$ = NamedBit{Name: Ident
 
 // 22.1
 
-OctetStringType : OCTET STRING  { $$ = OctetStringType{} }
+OctetStringType : OCTET STRING  { $$ = OctetStringType{} } 
+;
+
+OctetStringValue :  HSTRING  { $$ = OctetString($1) }
+                 |  BSTRING  { $$ = OctetString($1) }
 ;
 
 // 23.1

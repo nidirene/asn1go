@@ -4,8 +4,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/chemikadze/asn1go"
 	"os"
+
+	"github.com/nidirene/asn1go"
 )
 
 var usage = `

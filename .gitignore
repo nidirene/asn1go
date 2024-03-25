@@ -1,3 +1,4 @@
 .idea
 y.output
 *_generated.go
+.log

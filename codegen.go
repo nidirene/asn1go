@@ -139,8 +139,9 @@ func goifyName(name string) string {
 //
 // Feature support status:
 // - [.] AssignmentList
-//    - [ ] ValueAssignment
-//    - [x] TypeAssignment
+//   - [ ] ValueAssignment
+//   - [x] TypeAssignment
+//
 // - [ ] Imports
 func (ctx *moduleContext) generateDeclarations(module ModuleDefinition) []goast.Decl {
 	decls := make([]goast.Decl, 0)
@@ -280,6 +281,8 @@ func (ctx *moduleContext) generateTypeBody(typeDescr Type, isSet *bool) goast.Ex
 		return goast.NewIdent("asn1.ObjectIdentifier")
 	case ChoiceType:
 		return ctx.generateChoiceType(t, isSet)
+	case NullType:
+		return goast.NewIdent("bool")
 	default:
 		// NullType
 		ctx.appendError(fmt.Errorf("ignoring unsupported type %#v", typeDescr))

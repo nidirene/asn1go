@@ -3,8 +3,9 @@ package examples
 import (
 	"encoding/asn1"
 	"fmt"
-	"github.com/chemikadze/asn1go/internal/utils"
 	"testing"
+
+	"github.com/nidirene/asn1go/internal/utils"
 )
 
 //go:generate go run ../cmd/asn1go/main.go -package examples rfc4120.asn1 rfc4120_generated.go

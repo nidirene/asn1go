@@ -145,16 +145,22 @@ func TestRangeTypeConstraint(t *testing.T) {
 	expectedType := ConstraintedType{
 		Type: IntegerType{},
 		Constraint: Constraint{
-			ConstraintSpec: SubtypeConstraint{Unions{
-				Intersections{
-					{Elements: ValueRange{
-						LowerEndpoint: RangeEndpoint{Value: Number(0)},
-						UpperEndpoint: RangeEndpoint{Value: Number(5)}}}},
-				Intersections{
-					{Elements: SingleValue{Number(42)}},
-					{Elements: ValueRange{
-						LowerEndpoint: RangeEndpoint{Value: Number(10)},
-						UpperEndpoint: RangeEndpoint{Value: Number(15)}}}}},
+			ConstraintSpec: SubtypeConstraint{
+				Unions{
+					Intersections{
+						{Elements: ValueRange{
+							LowerEndpoint: RangeEndpoint{Value: Number(0)},
+							UpperEndpoint: RangeEndpoint{Value: Number(5)},
+						}},
+					},
+					Intersections{
+						{Elements: SingleValue{Number(42)}},
+						{Elements: ValueRange{
+							LowerEndpoint: RangeEndpoint{Value: Number(10)},
+							UpperEndpoint: RangeEndpoint{Value: Number(15)},
+						}},
+					},
+				},
 			},
 		},
 	}
@@ -285,14 +291,17 @@ func TestBitStringWithSizeConstraint(t *testing.T) {
 	expectedType := ConstraintedType{
 		Type: BitStringType{},
 		Constraint: Constraint{ConstraintSpec: SubtypeConstraint{
-			Unions{Intersections{IntersectionElements{Elements: SizeConstraint{Constraint: Constraint{ConstraintSpec: SubtypeConstraint{
-				Unions{Intersections{IntersectionElements{Elements: ValueRange{
-					LowerEndpoint: RangeEndpoint{Value: Number(32)},
-					UpperEndpoint: RangeEndpoint{},
+			Unions{Intersections{IntersectionElements{
+				Elements: SizeConstraint{
+					Constraint: Constraint{ConstraintSpec: SubtypeConstraint{
+						Unions{Intersections{IntersectionElements{
+							Elements: ValueRange{
+								LowerEndpoint: RangeEndpoint{Value: Number(32)},
+								UpperEndpoint: RangeEndpoint{},
+							},
+						}}},
+					}},
 				},
-				}}},
-			}},
-			},
 			}}},
 		}},
 	}
@@ -300,6 +309,54 @@ func TestBitStringWithSizeConstraint(t *testing.T) {
 	parsedAssignment := r.ModuleBody.AssignmentList.GetType("KerberosFlags")
 	if parsedAssignment == nil {
 		t.Fatal("Expected KerberosFlags in assignments")
+	}
+	parsedType := parsedAssignment.Type
+	// quick and dirty
+	if es, ps := fmt.Sprintf("%+v", expectedType), fmt.Sprintf("%+v", parsedType); es != ps {
+		t.Errorf("Repr mismatch:\n exp: %v\n got: %v", es, ps)
+	}
+}
+
+func TestOctetStringWithSizeConstraint(t *testing.T) {
+	content := `
+	TestSpec DEFINITIONS ::= BEGIN
+    ProprietaryInfo ::= SEQUENCE {
+      fileDetails OCTET STRING (SIZE(1)) DEFAULT tstValue
+    }
+    tstValue OCTET STRING ::= '00'H
+	END
+	`
+	expectedType := SequenceType{
+		Components: ComponentTypeList{
+			NamedComponentType{
+				NamedType: NamedType{
+					Identifier: "fileDetails",
+					Type: ConstraintedType{
+						Type: OctetStringType{},
+						Constraint: Constraint{ConstraintSpec: SubtypeConstraint{
+							Unions{Intersections{IntersectionElements{
+								Elements: SizeConstraint{
+									Constraint: Constraint{ConstraintSpec: SubtypeConstraint{
+										Unions{
+											Intersections{IntersectionElements{
+												Elements: SingleValue{Value: Number(1)},
+											}},
+										},
+									}},
+								},
+							}}},
+						}},
+					},
+				},
+			},
+			// Default: ValueReference("tstValue"),
+		},
+	}
+
+	r := testNotFails(t, content)
+	parsedAssignment := r.ModuleBody.AssignmentList.GetType("ProprietaryInfo")
+	if parsedAssignment == nil {
+		t.Fatal("Expected ProprietaryInfo in assignments")
 	}
 	parsedType := parsedAssignment.Type
 	// quick and dirty
@@ -666,21 +723,25 @@ func TestChoiceSyntax(t *testing.T) {
 			`,
 			expected: AssignmentList{
 				TypeAssignment{TypeReference: "Choice", Type: ChoiceType{ExtensionTypes: []ChoiceExtension{}}},
-				TypeAssignment{TypeReference: "Choice2", Type: ChoiceType{
-					AlternativeTypeList: []NamedType{
-						{Identifier: "alt1", Type: BooleanType{}},
-						{Identifier: "alt2", Type: BooleanType{}},
+				TypeAssignment{
+					TypeReference: "Choice2", Type: ChoiceType{
+						AlternativeTypeList: []NamedType{
+							{Identifier: "alt1", Type: BooleanType{}},
+							{Identifier: "alt2", Type: BooleanType{}},
+						},
+						ExtensionTypes: []ChoiceExtension{},
 					},
-					ExtensionTypes: []ChoiceExtension{}},
 				},
-				TypeAssignment{TypeReference: "Choice3", Type: ChoiceType{
-					AlternativeTypeList: []NamedType{
-						{Identifier: "alt1", Type: BooleanType{}},
+				TypeAssignment{
+					TypeReference: "Choice3", Type: ChoiceType{
+						AlternativeTypeList: []NamedType{
+							{Identifier: "alt1", Type: BooleanType{}},
+						},
+						ExtensionTypes: []ChoiceExtension{
+							NamedType{Identifier: "ext2", Type: BooleanType{}},
+							NamedType{Identifier: "ext3", Type: BooleanType{}},
+						},
 					},
-					ExtensionTypes: []ChoiceExtension{
-						NamedType{Identifier: "ext2", Type: BooleanType{}},
-						NamedType{Identifier: "ext3", Type: BooleanType{}},
-					}},
 				},
 			},
 		},
@@ -803,7 +864,7 @@ func TestIntegerSyntax(t *testing.T) {
 		},
 		{
 			name: "integers with references",
-			//skipReason: "definedvalue is not implemented",
+			// skipReason: "definedvalue is not implemented",
 			content: `
 			TestSpec DEFINITIONS ::= BEGIN
 				IntWithNames ::= INTEGER {

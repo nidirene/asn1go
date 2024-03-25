@@ -255,6 +255,14 @@ func (Boolean) Type() Type {
 	return BooleanType{}
 }
 
+// OctetString
+type OctetString string
+
+// Type implements Value
+func (OctetString) Type() Type {
+	return OctetStringType{}
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // types
 
@@ -536,7 +544,7 @@ func (t ConstraintedType) isType() {}
 // Constraint is a constraint applied to a type.
 type Constraint struct {
 	ConstraintSpec ConstraintSpec
-	//ExceptionSpec ExceptionSpec
+	// ExceptionSpec ExceptionSpec
 }
 
 // ConstraintSpec can be SubtypeConstraint or GeneralConstraint.
@@ -726,13 +734,12 @@ const (
 	UTCTimeName         = "UTCTime"
 )
 
-var (
-	// USEFUL_TYPES are defined in X.680, section 41.
-	// These are built-in types that behave like type assignments that are always in scope.
-	// TODO: clarify why UTCTimeName is missing here.
-	USEFUL_TYPES map[string]Type = map[string]Type{
-		GeneralizedTimeName: TaggedType{ // [UNIVERSAL 24] IMPLICIT VisibleString
-			Tag:  Tag{Class: CLASS_UNIVERSAL, ClassNumber: Number(24)},
-			Type: RestrictedStringType{VisibleString}},
-	}
-)
+// USEFUL_TYPES are defined in X.680, section 41.
+// These are built-in types that behave like type assignments that are always in scope.
+// TODO: clarify why UTCTimeName is missing here.
+var USEFUL_TYPES map[string]Type = map[string]Type{
+	GeneralizedTimeName: TaggedType{ // [UNIVERSAL 24] IMPLICIT VisibleString
+		Tag:  Tag{Class: CLASS_UNIVERSAL, ClassNumber: Number(24)},
+		Type: RestrictedStringType{VisibleString},
+	},
+}

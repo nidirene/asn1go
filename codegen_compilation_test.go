@@ -2,12 +2,13 @@ package asn1go
 
 import (
 	"fmt"
-	"github.com/chemikadze/asn1go/internal/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 	"text/template"
+
+	"github.com/nidirene/asn1go/internal/utils"
 )
 
 var driverProgramTemplate = `

@@ -2,9 +2,10 @@ package examples
 
 import (
 	"bytes"
-	"github.com/chemikadze/asn1go"
 	"io/ioutil"
 	"testing"
+
+	"github.com/nidirene/asn1go"
 )
 
 func testExampleParsing(t *testing.T, filename string) *asn1go.ModuleDefinition {
