@@ -7,6 +7,7 @@ import (
 	goprint "go/printer"
 	gotoken "go/token"
 	"io"
+	"reflect"
 	"strings"
 )
 
@@ -204,8 +205,10 @@ func (ctx *moduleContext) tryGenerateValueAssignment(ref ValueReference, t Type,
 		}
 	case Real:
 		valExpr = &goast.BasicLit{Value: fmt.Sprint(val)}
+	case ObjectIdentifierValue:
+		valExpr = objectIdentifierValueToExpr(val, ctx.params.IntegerRepr)
 	default:
-		// TODO: produce a warning?
+		fmt.Printf("Unsupported assigment value %v\n", reflect.TypeOf(val))
 		return nil
 	}
 	return &goast.GenDecl{
@@ -282,7 +285,7 @@ func (ctx *moduleContext) generateTypeBody(typeDescr Type, isSet *bool) goast.Ex
 	case ChoiceType:
 		return ctx.generateChoiceType(t, isSet)
 	case NullType:
-		return goast.NewIdent("bool")
+		return goast.NewIdent("asn1.Null")
 	default:
 		// NullType
 		ctx.appendError(fmt.Errorf("ignoring unsupported type %#v", typeDescr))
@@ -333,6 +336,20 @@ func numberToExpr(val Number, repr IntegerRepr) goast.Expr {
 	valueExpr = &goast.BasicLit{Value: fmt.Sprint(val.IntValue())}
 	if repr == IntegerReprBigInt {
 		valueExpr = &goast.CallExpr{Fun: goast.NewIdent("big.NewInt"), Args: []goast.Expr{valueExpr}}
+	}
+	return valueExpr
+}
+
+func objectIdentifierValueToExpr(val ObjectIdentifierValue, repr IntegerRepr) goast.Expr {
+	var valueExpr goast.Expr
+	elts := make([]goast.Expr, 0)
+	for _, oidValue := range val {
+		elts = append(elts, numberToExpr(Number(oidValue.ID), repr))
+	}
+	fmt.Printf("oid %v\n", elts)
+	valueExpr = &goast.CompositeLit{
+		Type: goast.NewIdent("asn1.Oid"),
+		Elts: elts,
 	}
 	return valueExpr
 }

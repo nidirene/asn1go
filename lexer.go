@@ -485,8 +485,8 @@ func isNewline(r rune) bool {
 	case 12:
 		return true
 	// CARRIAGE RETURN (13)
-	case 13:
-		return true
+	// case 13:
+	// 	return true
 	default:
 		return false
 	}

@@ -1,0 +1,45 @@
+RSPDefinitions {
+    joint-iso-itu-t(2) international-organizations(23) gsma(146) rsp(1) spec-version(1) version-two(2)
+} DEFINITIONS EXPLICIT TAGS EXTENSIBILITY IMPLIED::= BEGIN 
+
+IMPORTS Certificate, CertificateList, Time FROM PKIX1Explicit88 {
+    iso(1) identified-organization(3) dod(6) internet(1) security(5) mechanisms(5) pkix(7) id-mod(0) id-pkix1-explicit(18)
+} 
+
+SubjectKeyIdentifier FROM PKIX1Implicit88 {
+    iso(1) identified-organization(3) dod(6) internet(1) security(5) mechanisms(5) pkix(7) id-mod(0) id-pkix1-implicit(19)
+};
+
+id-rsp OBJECT IDENTIFIER ::= {joint-iso-itu-t(2) international-organizations(23) gsma(146) rsp(1)} 
+
+-- UniversalString ::= [UNIVERSAL 28] IMPLICIT OCTET STRING 
+
+-- Basic types, for size constraints 
+Octet8  ::= OCTET STRING (SIZE(8)) 
+Octet4  ::= OCTET STRING (SIZE(4)) 
+Octet16 ::= OCTET STRING (SIZE(16)) 
+OctetTo16 ::= OCTET STRING (SIZE(1..16)) 
+Octet32 ::= OCTET STRING (SIZE(32)) 
+Octet1 ::= OCTET STRING(SIZE(1)) 
+Octet2 ::= OCTET STRING (SIZE(2)) 
+VersionType ::= OCTET STRING(SIZE(3)) 
+-- major/minor/revision version are coded as binary value on byte 1/2/3, e.g. '02 00 0C' for v2.0.12. 
+-- If revision is not used (e.g. v2.1), byte 3 SHALL be set to '00'. 
+Iccid ::= [APPLICATION 26] OCTET STRING (SIZE(10)) -- ICCID as coded in EFiccid, corresponding tag is '5A' 
+RemoteOpId ::= [2] INTEGER {installBoundProfilePackage(1)} 
+TransactionId ::= OCTET STRING (SIZE(1..16))
+
+
+-- Definition of EUICCInfo1 -------------------------- 
+GetEuiccInfo1Request ::= [32] SEQUENCE { -- Tag 'BF20' 
+} 
+
+EUICCInfo1 ::= [32] SEQUENCE { -- Tag 'BF20'
+    svn [2] VersionType, -- GSMA SGP.22 version supported (SVN)
+    euiccCiPKIdListForVerification [9] SEQUENCE OF SubjectKeyIdentifier, -- List of CI Public Key Identifiers supported on the eUICC for signature verification
+    euiccCiPKIdListForSigning [10] SEQUENCE OF SubjectKeyIdentifier -- List of CI Public Key Identifier supported on the eUICC for signature creation
+}
+
+SubjectKeyIdentifier ::= OCTET STRING
+ 
+END
